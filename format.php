@@ -1026,14 +1026,13 @@ class Formatter
 	function formatJavascript($script)
 	{
 		// if js beautifier is available, let's use it.
-		if (file_exists('jsbeautifier.php'))
+		if (file_exists(dirname(__FILE__) . '/jsbeautifier.php'))
 		{
-			require_once ('jsbeautifier.php');
+			require_once (dirname(__FILE__) . '/jsbeautifier.php');
 			$jsb = new JSBeautifier();
 			$opts = new BeautifierOptions();
 			
 			$opts->indent_with_tabs = true;
-			
 			$script = $jsb->beautify($script, $opts);
 		}
 		return $script;
