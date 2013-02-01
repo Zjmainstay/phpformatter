@@ -103,7 +103,9 @@ class Formatter
 			T_CURLY_OPEN => '$$',
 			T_DEC => '--', T_DECLARE => 'declare', T_DEFAULT => 'defalt', T_DIR => '__DIR__',
 			T_DIV_EQUAL => ' /= ',
-			T_DNUMBER => ' $$ ', T_DOC_COMMENT => '$$', T_DOLLAR_OPEN_CURLY_BRACES => '$$',
+			T_DNUMBER => ' $$ ', T_DOC_COMMENT => function ($v) use ($blankline) {
+				return rtrim($v) . $blankline();
+			}, T_DOLLAR_OPEN_CURLY_BRACES => '$$',
 			T_DOUBLE_ARROW => ' => ',
 			T_DOUBLE_CAST => '(double) ', T_DOUBLE_COLON => '::', T_ECHO => 'echo ', T_EMPTY =>
 				'empty',
