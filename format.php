@@ -65,6 +65,7 @@ class Formatter
 		// unindent by on closing brackets.
 		$controls = array(0);
 		$controlbrackets = array();
+		$case = false;
 		$control = function ($keyword) use 
 		(&$lastcontrol, &$controls, &$controlbrackets, &$brackets) {
 			return function ($v, $t) use 
@@ -95,44 +96,42 @@ class Formatter
 				'array',
 			T_ARRAY_CAST => '(array) ', T_AS => ' as ', T_BAD_CHARACTER => '$$',
 			T_BOOLEAN_AND => ' && ',
-			T_BOOLEAN_OR => ' || ', T_BOOL_CAST => '(bool) ', T_BREAK => 'break', T_CASE =>
-				'case ',
-			T_CHARACTER => '$$', T_CLASS_C => '__CLASS__', T_CLONE => 'clone ',
-			T_CONCAT_EQUAL => ' .= ',
-			T_CONST => 'const ', T_CONSTANT_ENCAPSED_STRING => '$$', T_CONTINUE => 'continue',
-			T_CURLY_OPEN => '$$',
-			T_DEC => '--', T_DECLARE => 'declare', T_DEFAULT => 'defalt', T_DIR => '__DIR__',
-			T_DIV_EQUAL => ' /= ',
-			T_DNUMBER => ' $$ ', T_DOC_COMMENT => function ($v) use ($blankline) {
-				return rtrim($v) . $blankline();
-			}, T_DOLLAR_OPEN_CURLY_BRACES => '$$',
-			T_DOUBLE_ARROW => ' => ',
-			T_DOUBLE_CAST => '(double) ', T_DOUBLE_COLON => '::', T_ECHO => 'echo ', T_EMPTY =>
-				'empty',
-			T_ENCAPSED_AND_WHITESPACE => '$$', T_ENDDECLARE => 'enddeclare', T_END_HEREDOC =>
-				'$$',
-			T_EVAL => '$$', T_EXIT => 'exit', T_EXTENDS => ' extends ', T_FILE => '__FILE__',
-			T_FINAL => 'final ',
-			T_FUNC_C => '__FUNCTION__', T_GLOBAL => 'global ', T_GOTO => 'goto ',
-			T_HALT_COMPILER => '$$',
-			T_IMPLEMENTS => ' implements ', T_INC => '++', T_INCLUDE => 'include ',
-			T_INCLUDE_ONCE => 'include_once ',
-			T_INSTANCEOF => ' instanceof ', T_INT_CAST => ' (int) ', T_INTERFACE =>
-				'interface ',
-			T_ISSET => 'isset', T_IS_EQUAL => ' == ', T_IS_GREATER_OR_EQUAL => ' >= ',
-			T_IS_IDENTICAL => ' === ',
-			T_IS_NOT_EQUAL => ' != ', T_IS_NOT_IDENTICAL => ' !== ', T_IS_SMALLER_OR_EQUAL =>
-				' <= ',
-			T_LINE => '__LINE__', T_LIST => 'list', T_LNUMBER => '$$', T_LOGICAL_AND =>
-				' and ',
-			T_LOGICAL_OR => ' or ', T_LOGICAL_XOR => ' xor ', T_METHOD_C => '__METHOD__',
-			T_MINUS_EQUAL => ' -= ',
-			T_MOD_EQUAL => ' %= ', T_MUL_EQUAL => ' *= ', T_NAMESPACE => 'namespace ',
-			T_NS_C => '__NAMESPACE__',
-			T_NS_SEPARATOR => '\\', T_NEW => 'new ', T_NUM_STRING => '$$', T_OBJECT_CAST =>
-				'(object) ',
-			T_OBJECT_OPERATOR => '->', T_OPEN_TAG_WITH_ECHO => '<?=', T_OR_EQUAL => ' |= ',
-			T_PAAMAYIM_NEKUDOTAYIM => '::',
+			T_BOOLEAN_OR => ' || ', T_BOOL_CAST => '(bool) ', T_BREAK => 'break',
+			T_CHARACTER => '$$',
+			T_CLASS_C => '__CLASS__', T_CLONE => 'clone ', T_CONCAT_EQUAL => ' .= ', T_CONST =>
+				'const ',
+			T_CONSTANT_ENCAPSED_STRING => '$$', T_CONTINUE => 'continue', T_CURLY_OPEN => '$$',
+			T_DEC => '--',
+			T_DECLARE => 'declare', T_DEFAULT => 'defalt', T_DIR => '__DIR__', T_DIV_EQUAL =>
+				' /= ',
+			T_DNUMBER => ' $$ ', T_DOLLAR_OPEN_CURLY_BRACES => '$$', T_DOUBLE_ARROW => ' => ',
+			T_DOUBLE_CAST => '(double) ',
+			T_DOUBLE_COLON => '::', T_ECHO => 'echo ', T_EMPTY => 'empty',
+			T_ENCAPSED_AND_WHITESPACE => '$$',
+			T_ENDDECLARE => 'enddeclare', T_END_HEREDOC => '$$', T_EVAL => '$$', T_EXIT =>
+				'exit',
+			T_EXTENDS => ' extends ', T_FILE => '__FILE__', T_FINAL => 'final ', T_FUNC_C =>
+				'__FUNCTION__',
+			T_GLOBAL => 'global ', T_GOTO => 'goto ', T_HALT_COMPILER => '$$', T_IMPLEMENTS =>
+				' implements ',
+			T_INC => '++', T_INCLUDE => 'include ', T_INCLUDE_ONCE => 'include_once ',
+			T_INSTANCEOF => ' instanceof ',
+			T_INT_CAST => ' (int) ', T_INTERFACE => 'interface ', T_ISSET => 'isset',
+			T_IS_EQUAL => ' == ',
+			T_IS_GREATER_OR_EQUAL => ' >= ', T_IS_IDENTICAL => ' === ', T_IS_NOT_EQUAL =>
+				' != ',
+			T_IS_NOT_IDENTICAL => ' !== ', T_IS_SMALLER_OR_EQUAL => ' <= ', T_LINE =>
+				'__LINE__',
+			T_LIST => 'list', T_LNUMBER => '$$', T_LOGICAL_AND => ' and ', T_LOGICAL_OR =>
+				' or ',
+			T_LOGICAL_XOR => ' xor ', T_METHOD_C => '__METHOD__', T_MINUS_EQUAL => ' -= ',
+			T_MOD_EQUAL => ' %= ',
+			T_MUL_EQUAL => ' *= ', T_NAMESPACE => 'namespace ', T_NS_C => '__NAMESPACE__',
+			T_NS_SEPARATOR => '\\',
+			T_NEW => 'new ', T_NUM_STRING => '$$', T_OBJECT_CAST => '(object) ',
+			T_OBJECT_OPERATOR => '->',
+			T_OPEN_TAG_WITH_ECHO => '<?=', T_OR_EQUAL => ' |= ', T_PAAMAYIM_NEKUDOTAYIM =>
+				'::',
 			T_PLUS_EQUAL => ' += ', T_PRINT => 'print', T_PRIVATE => 'private ', T_PUBLIC =>
 				'public ',
 			T_PROTECTED => 'protected ', T_REQUIRE => 'require ', T_REQUIRE_ONCE =>
@@ -159,6 +158,8 @@ class Formatter
 			}, T_COMMENT => function ($v) use ($blankline) {
 				return rtrim($v) . (substr($v, - 2) == '*/' ||
 						 substr($v, - 1) == "\n" ? $blankline() : '');
+			}, T_DOC_COMMENT => function ($v) use ($blankline) {
+				return rtrim($v) . $blankline();
 			}, T_RETURN => function ($v, $t, $tokens, $i) use (&$tabs) {
 				if ($tokens[$i + 1][0] == ';')
 					return 'return';
@@ -200,6 +201,12 @@ class Formatter
 				$tabs++;
 				
 				return 'do ';
+			}, T_SWITCH => $control('switch'), T_CASE => function ($v) use (&$case) {
+				$case = true;
+				return 'case ';
+			}, T_DEFAULT => function ($v) use (&$case) {
+				$case = true;
+				return 'default';
 			}, T_WHILE => $control('while'), T_FOR => $control('for'), T_CLASS => $control(
 						'class '),
 				T_FUNCTION => function ($v, $t, $tokens, $i) use 
@@ -304,13 +311,19 @@ class Formatter
 			}, '?' => function () use (&$ternary) {
 				$ternary++;
 				return ' ? ';
-			}, ':' => function () use (&$ternary) {
+			}, ':' => function () use (&$ternary, &$case, $blankline) {
+				
+				if ($case)
+				{
+					$case = false;
+					return ':' . $blankline();
+				}
 				if ($ternary > 0)
 				{
 					$ternary--;
 					return ' : ';
 				}
-				// non-ternary, do not pad the colon (e.g. alt control syntax)
+				// not a case, non-ternary, do not pad the colon (e.g. alt control syntax)
 				return ': ';
 			}, T_OPEN_TAG => function ($v, $t, $tokens, $i) use 
 					(&$tabs, &$oneliner, $blankline) {
@@ -1071,20 +1084,23 @@ class Formatter
 	}
 }
 
-// run it as a command line tool
-$argc = $_SERVER['argc'];
-$argv = $_SERVER['argv'];
-
-if ($argc < 2)
+if (!defined('CLASSONLY'))
 {
-	printf("Usage: %s input file [output file]\n" . "Input file can be '-' for stdin, " .
-			"and output can be '_' for same as input.\n\n",
-		$argv[0]);
-	exit(0);
+	// run it as a command line tool
+	$argc = $_SERVER['argc'];
+	$argv = $_SERVER['argv'];
+	
+	if ($argc < 2)
+	{
+		printf("Usage: %s input file [output file]\n" . "Input file can be '-' for stdin, " .
+				"and output can be '_' for same as input.\n\n",
+			$argv[0]);
+		exit(0);
+	}
+	
+	$out = Formatter::FormatFile($argv[1] == '-' ? 'php://stdin' : $argv[1]);
+	if ($argc > 2)
+		file_put_contents($argv[2] = '_' ? $argv[1] : $argv[2], $out);
+	else
+		echo $out;
 }
-
-$out = Formatter::FormatFile($argv[1] == '-' ? 'php://stdin' : $argv[1]);
-if ($argc > 2)
-	file_put_contents($argv[2] = '_' ? $argv[1] : $argv[2], $out);
-else
-	echo $out;

@@ -1,12 +1,10 @@
 <?php
 
-require_once ('format.php');
+define('CLASSONLY', true);
+require_once (dirname(__FILE__) . '/format.php');
 
 function JsBeautify($file)
 {
-	var_dump($file);
-	var_dump(file_get_contents($file));
-
 	return Formatter::formatJavascript(file_get_contents($file));
 }
 
